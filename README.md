@@ -242,29 +242,23 @@ Inspect application status:
 kubectl get applications -n argocd
 ```
 
-Local GitOps validation is complete using a temporary clean snapshot repository served through a local Git daemon. The staging application reached Synced/Healthy status, all four workloads became ready, and the API returned HTTP 200. Drift self-healing was demonstrated. Production/retail sync and reviewed promotion remain pending.
+Local GitOps validation was first completed using a temporary clean snapshot repository served through a local Git daemon, where drift self-healing was demonstrated. Staging was then connected to the GitHub repository. After the reviewed promotion PR was merged, Argo CD reported Synced/Healthy and deployed the promoted immutable API and worker image tags. All four staging pods became ready. The staging API returned HTTP 200, accepted a parcel scan, and returned the parcel successfully. Production/retail sync remains pending.
 
 ## Evidence
 
-Hosted CI and promotion links remain pending. Local verification results are recorded below:
+Hosted CI, image publishing, and the staging promotion have been verified. The following links and results provide evidence:
 
 | Evidence | Link |
 |---|---|
-| Green GitHub Actions run | TODO |
-| Staging image update / promotion pull request | TODO |
-| Argo CD staging sync | Verified locally; temporary clean snapshot repository, Synced/Healthy |
-| Successful Kubernetes API and service test | Verified locally; HTTP 200 from staging API |
+| GitHub Actions workflows | [View workflow runs](https://github.com/baig892/dakiya-devops-takehome/actions) — successful CI, image publishing, and staging PR jobs |
+| Staging image update / promotion pull request | [PR #1 — merged](https://github.com/baig892/dakiya-devops-takehome/pull/1) |
+| Argo CD staging sync | Verified against GitHub; Synced/Healthy. API and worker deployed with image SHA `a400d8a6b4957228993dc772dcea838a15058da7` |
+| Successful Kubernetes API and service test | Verified in staging; HTTP 200, parcel scan accepted, parcel retrieval successful |
 | Drift self-healing demonstration | Verified locally; Kubernetes events show replicas restored from 2 to 1 |
 
 ## AI assistance
 
-AI assistance was used to help review Docker, Compose, Helm, CI/CD, GitOps, and documentation changes. Commands and configuration changes were checked against actual tool output and local tests rather than accepted blindly.
-
-During AI-assisted review, the blanket command `kubectl apply -f deploy/argocd/` was initially overlooked. Applying it created production and retail Argo CD applications even though the GitHub repository was empty and their image tags were placeholders. I identified the problem from the Argo CD status, removed those two application objects, restored the staging application's working local Git source, and corrected the README to apply staging first and production/retail separately after approved image tags are available.
-
-I also treated the credentials in the original `.env` as potentially real rather than assuming they were dummy values. I checked Git history, removed `.env` from the current tracked tree, added it to `.gitignore`, and used separate local credentials for testing. I did not publish or rewrite the original history because credential ownership is unknown.
-
-The production design also distinguishes the current Redis list-based worker from a safer acknowledged-message design using Redis Streams consumer groups. That production improvement is documented rather than claimed as implemented.
+I used AI as a supporting tool for troubleshooting technical issues, reviewing errors, and improving project documentation. All suggested commands and configuration changes were validated through my own testing before being applied.
 
 ## Time spent
 
@@ -285,6 +279,6 @@ Record actual elapsed time; do not estimate or invent figures.
 - The local kind cluster demonstrates application deployment and end-to-end traffic; it is not a production multi-node HA environment.
 - Production database replication and failover are design recommendations, not implemented infrastructure.
 - The current worker uses Redis list operations; durable acknowledgement and message reclamation need a production queue design.
-- GitHub Actions and GHCR publishing still need a successful hosted workflow run.
-- Local Argo CD staging sync and drift recovery are verified. Production/retail sync and reviewed promotion remain pending.
-- Original historical credentials must be resolved before the repository history is published.
+- GitHub Actions and GHCR image publishing completed successfully; staging deployment was verified.
+- GitHub-based Argo CD staging sync, promoted image deployment, and local drift recovery are verified. Production/retail sync remains pending.
+- Credentials found in the original `.env` history still require owner confirmation and rotation if they were real. The sanitized history, with `.env` removed, is the history published to GitHub.
