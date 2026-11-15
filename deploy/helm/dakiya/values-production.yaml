@@ -1,9 +1,9 @@
 api:
-  tag: REPLACE_WITH_APPROVED_SHA
+  tag: a400d8a6b4957228993dc772dcea838a15058da7
   replicas: 3
 
 worker:
-  tag: REPLACE_WITH_APPROVED_SHA
+  tag: a400d8a6b4957228993dc772dcea838a15058da7
   replicas: 3
 
 postgres:
