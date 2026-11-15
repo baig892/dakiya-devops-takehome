@@ -262,17 +262,17 @@ I used AI as a supporting tool for troubleshooting technical issues, reviewing e
 
 ## Time spent
 
-Record actual elapsed time; do not estimate or invent figures.
+Approximately 13 hours were spent on the assignment. Individual task durations were not tracked separately.
 
 | Task | Actual time |
 |---|---|
-| Repository review and security investigation | TODO |
-| Docker and Compose improvements | TODO |
-| API and worker testing | TODO |
-| Helm and Kubernetes deployment | TODO |
-| CI/CD and GitOps configuration | TODO |
-| Design and documentation | TODO |
-| Total | TODO |
+| Repository review and security investigation | Included in total; not separately tracked |
+| Docker and Compose improvements | Included in total; not separately tracked |
+| API and worker testing | Included in total; not separately tracked |
+| Helm and Kubernetes deployment | Included in total; not separately tracked |
+| CI/CD and GitOps configuration | Included in total; not separately tracked |
+| Design and documentation | Included in total; not separately tracked |
+| **Total** | **Approximately 13 hours** |
 
 ## Limitations
 
