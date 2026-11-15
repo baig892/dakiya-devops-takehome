@@ -50,7 +50,7 @@ jobs:
             ./worker
 
       - name: Scan API image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.28.0
         with:
           image-ref: ghcr.io/baig892/dakiya-api:${{ github.sha }}
           format: table
@@ -59,7 +59,7 @@ jobs:
           severity: CRITICAL,HIGH
 
       - name: Scan worker image
-        uses: aquasecurity/trivy-action@0.28.0
+        uses: aquasecurity/trivy-action@v0.28.0
         with:
           image-ref: ghcr.io/baig892/dakiya-worker:${{ github.sha }}
           format: table
