@@ -27,9 +27,9 @@ See [DESIGN.md](DESIGN.md) for the proposed production architecture, failure han
 | Helm | Added environment values, PostgreSQL PVC, secret references, probes, and security contexts. | Lint and render tested |
 | Kubernetes | Installed the chart on local kind and tested API-to-Redis-to-worker-to-PostgreSQL traffic. | Tested |
 | CI/CD | Workflow includes tests, image builds, Trivy scans, and GHCR publishing steps. | Configured; hosted run pending |
-| GitOps | Argo CD definitions exist for staging, production, and retail. | Configured; Argo CD sync pending |
+| GitOps | Argo CD staging application deployed from a temporary clean Git snapshot using a local Git daemon. API, worker, PostgreSQL, and Redis are healthy. | Local staging sync tested; production/retail sync pending |
 | Promotion | Staging is intended to receive new image versions; production and retail require reviewed Git changes. | Partially implemented; end-to-end promotion pending |
-| Drift recovery | Argo CD self-healing is configured for staging and retail. | Not yet demonstrated |
+| Drift recovery | Manually scaled staging API from 1 to 2 replicas; Argo CD restored the Git-defined count of 1. Kubernetes events confirmed scale-up and scale-down. | Demonstrated and verified |
 
 ## Run locally with Docker Compose
 
@@ -223,19 +223,19 @@ Inspect application status:
 kubectl get applications -n argocd
 ```
 
-The GitOps bootstrap, successful sync, reviewed promotion, and drift self-healing demonstration are not yet verified. Do not treat these commands as completed test evidence.
+Local GitOps validation is complete using a temporary clean snapshot repository served through a local Git daemon. The staging application reached Synced/Healthy status, all four workloads became ready, and the API returned HTTP 200. Drift self-healing was demonstrated. Production/retail sync and reviewed promotion remain pending.
 
 ## Evidence
 
-Add real links after the corresponding actions have been completed:
+Hosted CI and promotion links remain pending. Local verification results are recorded below:
 
 | Evidence | Link |
 |---|---|
 | Green GitHub Actions run | TODO |
 | Staging image update / promotion pull request | TODO |
-| Argo CD staging sync | TODO |
-| Successful Kubernetes API and service test | Local terminal evidence; no public link |
-| Drift self-healing demonstration | TODO |
+| Argo CD staging sync | Verified locally; temporary clean snapshot repository, Synced/Healthy |
+| Successful Kubernetes API and service test | Verified locally; HTTP 200 from staging API |
+| Drift self-healing demonstration | Verified locally; Kubernetes events show replicas restored from 2 to 1 |
 
 ## AI assistance
 
@@ -265,5 +265,5 @@ Record actual elapsed time; do not estimate or invent figures.
 - Production database replication and failover are design recommendations, not implemented infrastructure.
 - The current worker uses Redis list operations; durable acknowledgement and message reclamation need a production queue design.
 - GitHub Actions and GHCR publishing still need a successful hosted workflow run.
-- Argo CD sync, promotion, and drift recovery still need to be demonstrated.
+- Local Argo CD staging sync and drift recovery are verified. Production/retail sync and reviewed promotion remain pending.
 - Original historical credentials must be resolved before the repository history is published.
