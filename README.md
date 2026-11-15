@@ -191,6 +191,18 @@ done
 
 Production and retail image tags must be replaced with approved immutable image SHAs before deployment.
 
+### Promotion procedure
+
+1. CI builds and scans the API and worker images, then opens a pull request updating the staging image tags.
+2. Review and merge the staging pull request. Argo CD automatically syncs staging.
+3. Verify staging health and application behavior before requesting production or retail promotion.
+4. Open a separate reviewed Git pull request changing the production and/or retail API and worker tags to the same approved immutable image SHA. Do not rebuild the images for promotion.
+5. After approval and merge, manually sync the production Argo CD application. Retail uses automated sync after the reviewed Git change is merged.
+6. Verify the deployed image tags and application health in each target environment.
+
+The production and retail promotion procedure is documented but has not yet been executed end to end in this local assessment.
+
+
 ## GitOps bootstrap and validation
 
 The Argo CD Application definitions are in `deploy/argocd/`.
@@ -214,7 +226,14 @@ kubectl wait --for=condition=Available deployment \
 Apply the applications:
 
 ```bash
-kubectl apply -f deploy/argocd/
+kubectl apply -f deploy/argocd/staging.yaml
+```
+
+Only after replacing the production and retail image placeholders with approved immutable image SHAs, apply those applications separately:
+
+```bash
+kubectl apply -f deploy/argocd/production.yaml
+kubectl apply -f deploy/argocd/retail.yaml
 ```
 
 Inspect application status:
@@ -241,7 +260,9 @@ Hosted CI and promotion links remain pending. Local verification results are rec
 
 AI assistance was used to help review Docker, Compose, Helm, CI/CD, GitOps, and documentation changes. Commands and configuration changes were checked against actual tool output and local tests rather than accepted blindly.
 
-One important security decision was not to assume that credentials in the original `.env` were dummy values. Their ownership is unknown, so they were not reused, and publishing the original Git history remains blocked until exposure is resolved with the owner.
+During AI-assisted review, the blanket command `kubectl apply -f deploy/argocd/` was initially overlooked. Applying it created production and retail Argo CD applications even though the GitHub repository was empty and their image tags were placeholders. I identified the problem from the Argo CD status, removed those two application objects, restored the staging application's working local Git source, and corrected the README to apply staging first and production/retail separately after approved image tags are available.
+
+I also treated the credentials in the original `.env` as potentially real rather than assuming they were dummy values. I checked Git history, removed `.env` from the current tracked tree, added it to `.gitignore`, and used separate local credentials for testing. I did not publish or rewrite the original history because credential ownership is unknown.
 
 The production design also distinguishes the current Redis list-based worker from a safer acknowledged-message design using Redis Streams consumer groups. That production improvement is documented rather than claimed as implemented.
 
