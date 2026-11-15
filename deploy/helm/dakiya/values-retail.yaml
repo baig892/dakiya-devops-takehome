@@ -1,0 +1,12 @@
+api:
+  tag: REPLACE_WITH_APPROVED_SHA
+  replicas: 2
+
+worker:
+  tag: REPLACE_WITH_APPROVED_SHA
+  replicas: 2
+
+postgres:
+  persistence:
+    enabled: true
+    size: 10Gi

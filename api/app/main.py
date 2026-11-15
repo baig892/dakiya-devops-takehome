@@ -1,3 +1,4 @@
+from typing import Literal
 import json
 import logging
 import os
@@ -31,7 +32,13 @@ app = FastAPI(title="Dakiya Tracking API", lifespan=lifespan)
 
 class ScanEvent(BaseModel):
     tracking_id: str
-    status: str  # booked, in_transit, out_for_delivery, delivered, returned
+    status: Literal[
+        "booked",
+        "in_transit",
+        "out_for_delivery",
+        "delivered",
+        "returned",
+    ]
     depot: str
     scanned_at: datetime
 

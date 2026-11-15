@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dakiya-retail
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/baig892/dakiya-devops-takehome.git
+    targetRevision: main
+    path: deploy/helm/dakiya
+    helm:
+      valueFiles:
+        - values.yaml
+        - values-retail.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: dakiya-retail
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

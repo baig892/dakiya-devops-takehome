@@ -1,19 +1,26 @@
-version: "3"
-
 services:
   db:
-    image: postgres:latest
+    image: postgres:18.7
     environment:
-      POSTGRES_USER: dakiya
-      POSTGRES_PASSWORD: dakiya_prod_2024!
-      POSTGRES_DB: dakiya
-    ports:
-      - "5432:5432"
+      POSTGRES_USER: ${DB_USER:-dakiya}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set in .env}
+      POSTGRES_DB: ${DB_NAME:-dakiya}
+    volumes:
+      - dakiya_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-dakiya} -d ${DB_NAME:-dakiya}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
 
   redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
+    image: redis:7.4.2
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
 
   api:
     build: ./api
@@ -21,11 +28,20 @@ services:
     ports:
       - "8080:8000"
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
   worker:
     build: ./worker
     env_file: .env
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  dakiya_postgres_data:
+    name: dakiya_postgres_data

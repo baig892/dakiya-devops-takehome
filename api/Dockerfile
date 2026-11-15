@@ -1,11 +1,21 @@
-FROM python:latest
+FROM python:3.12-slim
 
-ARG DB_PASSWORD
-ENV DB_PASSWORD=${DB_PASSWORD}
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
 
 WORKDIR /app
-COPY . .
-RUN pip install -r requirements.txt
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt \
+    && useradd --create-home --uid 10001 appuser \
+    && mkdir -p /app/logs \
+    && chown -R appuser:appuser /app
+
+COPY --chown=appuser:appuser . .
+
+USER appuser
 
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

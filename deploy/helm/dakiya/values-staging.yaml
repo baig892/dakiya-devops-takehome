@@ -1,0 +1,10 @@
+api:
+  replicas: 1
+
+worker:
+  replicas: 1
+
+postgres:
+  persistence:
+    enabled: true
+    size: 5Gi
