@@ -242,7 +242,7 @@ Inspect application status:
 kubectl get applications -n argocd
 ```
 
-Local GitOps validation was first completed using a temporary clean snapshot repository served through a local Git daemon, where drift self-healing was demonstrated. Staging was then connected to the GitHub repository. After the reviewed promotion PR was merged, Argo CD reported Synced/Healthy and deployed the promoted immutable API and worker image tags. All four staging pods became ready. The staging API returned HTTP 200, accepted a parcel scan, and returned the parcel successfully. Production/retail sync remains pending.
+Local GitOps validation was first completed using a temporary clean snapshot repository served through a local Git daemon, where drift self-healing was demonstrated. Staging was then connected to the GitHub repository. A new immutable image was built, tested, and published through GitHub Actions. The staging image update was merged through PR #1, and the tested image was promoted to production and retail through reviewed PR #3. Argo CD reports Synced/Healthy for all three environments. Staging has four ready pods, production has eight ready pods, and retail has six ready pods. The API was tested in all three environments with HTTP 200 health checks, HTTP 202 scan acceptance, and successful parcel retrieval.
 
 ## Evidence
 
@@ -280,5 +280,5 @@ Record actual elapsed time; do not estimate or invent figures.
 - Production database replication and failover are design recommendations, not implemented infrastructure.
 - The current worker uses Redis list operations; durable acknowledgement and message reclamation need a production queue design.
 - GitHub Actions and GHCR image publishing completed successfully; staging deployment was verified.
-- GitHub-based Argo CD staging sync, promoted image deployment, and local drift recovery are verified. Production/retail sync remains pending.
+- GitHub-based Argo CD sync and deployment are verified for staging, production, and retail. All three environments report Synced/Healthy, and local drift self-healing is verified.
 - Credentials found in the original `.env` history still require owner confirmation and rotation if they were real. The sanitized history, with `.env` removed, is the history published to GitHub.
